@@ -6,38 +6,16 @@
 # - comparison two Rational numbers.
 from math import gcd
 
-def reduced_form(method):
-	def reduce(self, *args, **kwargs):
-		method(self, *args, **kwargs)
-		if self.denominator < 0:
-			self.denominator = -self.denominator
-			self.numerator = -self.numerator
-		k = gcd(self.numerator, self.denominator)
-		self.numerator//=k
-		self.denominator//=k
-		return None
-	return reduce
-
-def reduced_formi(method):
-	def reduce(self, *args, **kwargs):
-		method(self, *args, **kwargs)
-		if self.denominator < 0:
-			self.denominator = -self.denominator
-			self.numerator = -self.numerator
-		k = gcd(self.numerator, self.denominator)
-		self.numerator//=k
-		self.denominator//=k
-		return self
-	return reduce
 
 class Rational:
-	@reduced_form
+
 	def __init__(self, numerator, denominator):
 		self.numerator, self.denominator = numerator, denominator
-		# self.__reduced_form()
+		self.reduce()
 
 	def __str__(self):
 		return f'{self.__numerator}/{self.__denominator}' 
+
 
 	@property
 	def numerator(self):
@@ -48,6 +26,7 @@ class Rational:
 		if not (isinstance(value, int)):
 			raise TypeError("Wrong value type")
 		self.__numerator = value
+
 
 	@property
 	def denominator(self):
@@ -61,77 +40,138 @@ class Rational:
 			raise ZeroDivisionError("Denominator cant be Zero")
 		self.__denominator = value
 
-	@property
+
 	def floated(self):
 		return self.numerator/self.denominator
 
+
+	def reduce(self):
+		k = gcd(self.numerator, self.denominator)
+		self.numerator//= k
+		self.denominator//=k
+		if self.denominator < 0:
+			self.numerator = -self.numerator
+			self.denominator = -self.denominator
+
+
 	def __add__(self, other):
-		return Rational(self.numerator * other.denominator + other.numerator * self.denominator, 
-						self.denominator *  other.denominator)
+		if isinstance(other, Rational):
+			new_num, new_denom = self.numerator * other.denominator + other.numerator * self.denominator, self.denominator * other.denominator
+		elif isinstance(other, int):
+			new_num, new_denom = self.numerator + other * self.denominator, self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		return Rational(new_num, new_denom)
+
 
 	def __sub__(self, other):
-		return Rational(self.numerator * other.denominator - other.numerator * self.denominator, 
-						self.denominator * other.denominator)
+		if isinstance(other, Rational):
+			new_num, new_denom = self.numerator * other.denominator - other.numerator * self.denominator, self.denominator * other.denominator
+		elif isinstance(other, int):
+			new_num, new_denom = self.numerator - other * self.denominator, self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		return Rational(new_num, new_denom)
+
 
 	def __mul__(self, other):
-		return Rational(self.numerator * other.numerator, self.denominator * other.denominator)
-	
+		if isinstance(other, Rational):
+			new_num, new_denom = self.numerator * other.numerator, self.denominator * other.denominator
+		elif isinstance(other, int):
+			new_num = self.numerator * other
+			new_denom = self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		return Rational(new_num, new_denom)
+
+
 	def __truediv__(self, other):
-		return Rational(self.numerator *other.denominator, self.denominator *  other.numerator)
+		if isinstance(other, Rational):
+			new_num, new_denom = self.numerator * other.denominator, self.denominator *  other.numerator
+		elif isinstance(other, int):
+			new_num = self.numerator
+			new_denom = self.denominator * other
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		return Rational(new_num, new_denom)
+		
 
 	def __eq__(self, other) -> bool:
-		return self.floated == other.floated
+		return self.numerator * other.denominator == other.numerator * self.denominator
 
 	def __ne__(self, other) -> bool:
-		return self.floated != other.floated
+		return self.numerator * other.denominator != other.numerator * self.denominator
 
 	def __lt__(self, other) -> bool:
-		return self.floated < other.floated
+		return self.numerator * other.denominator < other.numerator * self.denominator
 
 	def __gt__(self, other) -> bool:
-		return self.floated > other.floated
+		return self.numerator * other.denominator > other.numerator * self.denominator
 
 	def __le__(self, other) -> bool:
-		return self.floated <= other.floated
+		return self.numerator * other.denominator <= other.numerator * self.denominator
 
 	def __ge__(self, other) -> bool:
-		return self.floated >= other.floated
-
-	# def __reduced_form(self):
-	# 	k = gcd(self.numerator, self.denominator)
-	# 	self.numerator//=k
-	# 	self.denominator//=k
-
-	@reduced_formi
-	def __iadd__(self, other):
-		self.numerator =  self.numerator * other.denominator + other.numerator * self.denominator 
-		self.denominator = self.denominator * other.denominator
-		return self
-
-	@reduced_formi
-	def __isub__(self, other):
-		self.numerator =  self.numerator * other.denominator - other.numerator * self.denominator 
-		self.denominator = self.denominator *  other.denominator
-		return self
-
-	@reduced_formi
-	def __imul__(self, other):
-		self.numerator =  self.numerator * other.numerator 
-		self.denominator = self.denominator *  other.denominator
-		return self
+		return self.numerator * other.denominator >= other.numerator * self.denominator
 	
+	def __iadd__(self, other):
+		if isinstance(other , Rational):
+			self.numerator = self.numerator * other.denominator + other.numerator * self.denominator
+			self.denominator =  self.denominator *  other.denominator
+		elif isinstance(other, int):
+			self.numerator, self.denominator = self.numerator + other * self.denominator, self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		self.reduce()
+		return self
 
-	@reduced_formi
+
+	def __isub__(self, other):
+		if isinstance(other , Rational):
+			self.numerator = self.numerator * other.denominator - other.numerator * self.denominator
+			self.denominator =  self.denominator *  other.denominator
+		elif isinstance(other, int):
+			self.numerator, self.denominator = self.numerator - other * self.denominator, self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		self.reduce()
+		return self
+
+
+	def __imul__(self, other):
+		if isinstance(other, Rational):
+			self.numerator, self.denominator = self.numerator * other.numerator, self.denominator * other.denominator
+		elif isinstance(other, int):
+			self.numerator = self.numerator * other
+			self.denominator = self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		self.reduce()
+		return self
+
+
 	def __itruediv__(self, other):
-		self.numerator =  self.numerator * other.denominator
-		self.denominator = self.denominator *  other.numerator
+		if isinstance(other, Rational):
+			self.numerator, self.denominator = self.numerator * other.denominator, self.denominator * other.numerator
+		elif isinstance(other, int):
+			self.numerator = self.numerator * other
+			self.denominator = self.denominator
+		else: 
+			raise TypeError("Should be Rational or Integer")
+		self.reduce()
 		return self
 
 	
 
 if __name__ == "__main__":
-	x = Rational(2, -6)
-	y = Rational(-1, 3)
+	x = Rational(-3, 4)
+	y = Rational(10, 6)
+
+	x += y
+	print (x)
+
+	x -= y
+	print (x)
 
 	print("Z:")
 	z = x + y
@@ -146,27 +186,25 @@ if __name__ == "__main__":
 	z = x / y
 	print (z)
 
-	print("X:")
-	print(x)
+	z = y+1
+	print (z)
 
-	x+=y
-	print (x)
+	z = y-1
+	print (z)
 
-	x-=y
-	print (x)
+	z = y*2
+	print (z)
 
-	x*=y
-	print (x)
-
-	x/=y
-	print (x)
+	z = y/2
+	print (z)
 
 	print("СРАВНЕНИЯ")
-	print (x == y)
-	print (x < y)
-	print (x > y)
-	print (x <= y)
-	print (x >= y)
+	print(f"{x == y = }")
+	print(f"{x != y = }")
+	print(f"{x > y = }")
+	print(f"{x < y = }")
+	print(f"{x >= y = }")
+	print(f"{x <= y = }")
 
 
 
