@@ -97,23 +97,54 @@ class Rational:
 		
 
 	def __eq__(self, other) -> bool:
-		return self.numerator * other.denominator == other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator == other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator == other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 
 	def __ne__(self, other) -> bool:
-		return self.numerator * other.denominator != other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator != other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator != other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 
 	def __lt__(self, other) -> bool:
-		return self.numerator * other.denominator < other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator < other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator < other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 
 	def __gt__(self, other) -> bool:
-		return self.numerator * other.denominator > other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator > other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator > other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 
 	def __le__(self, other) -> bool:
-		return self.numerator * other.denominator <= other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator <= other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator <= other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 
 	def __ge__(self, other) -> bool:
-		return self.numerator * other.denominator >= other.numerator * self.denominator
+		if isinstance(other, Rational):
+			return self.numerator * other.denominator >= other.numerator * self.denominator
+		elif isinstance(other, int):
+			return self.numerator >= other * self.denominator
+		else:
+			raise TypeError("Wrong type, should be Rational or int")
 	
+
 	def __iadd__(self, other):
 		if isinstance(other , Rational):
 			self.numerator = self.numerator * other.denominator + other.numerator * self.denominator
@@ -164,8 +195,8 @@ class Rational:
 	
 
 if __name__ == "__main__":
-	x = Rational(-3, 4)
-	y = Rational(10, 6)
+	x = Rational(7, 6)
+	y = Rational(3, 5)
 
 	x += y
 	print (x)
@@ -205,6 +236,14 @@ if __name__ == "__main__":
 	print(f"{x < y = }")
 	print(f"{x >= y = }")
 	print(f"{x <= y = }")
+
+	print("СРАВНЕНИЯ")
+	print(f"{x == 1 = }")
+	print(f"{x != 1 = }")
+	print(f"{x > 1 = }")
+	print(f"{x < 1 = }")
+	print(f"{x >= 1 = }")
+	print(f"{x <= 1 = }")
 
 
 

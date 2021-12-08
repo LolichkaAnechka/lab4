@@ -1,11 +1,11 @@
 # Create a class CALENDAR. 
 # Define methods for creating and working with a CALENDAR instances and overload operations:
-# "+=, -=" - for adding and subtracting days, months, years to a given date
+# "+=, -=" - for adding and subtracting days, days_in_months, years to a given date
 # "==, ! =, >, >=, <, <=" - for comparing dates.
 MAX_MONTH_IN_YEAR = 12
 
 class Calendar:
-	months = (29, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+	days_in_months = (29, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
 
 	def __init__(self, day, month, year) -> None:
@@ -26,7 +26,7 @@ class Calendar:
 	def day (self, value):
 		if not isinstance(value, int):
 			raise TypeError("Wrong value type")
-		if not 0 < value <= self.months[self.isleap_february()]:
+		if not 0 < value <= self.days_in_months[self.define_month()]:
 			raise ValueError("Wrong day value")
 		self.__day = value
 
@@ -62,7 +62,10 @@ class Calendar:
 		return self.year % 4 == 0 and (self.year % 100 != 0 or self.year % 400 == 0)
 
 
-	def isleap_february(self):
+	def define_month(self):
+		"""Returns current month number
+		
+		Returns 0 if it is February in Leap year"""
 		return self.month if not (self.isleap() and self.month == 2) else 0
 
 
@@ -73,11 +76,12 @@ class Calendar:
 		if not isinstance(value, int):
 			raise TypeError("Wrong type, should be int")
 		self.year += value//MAX_MONTH_IN_YEAR
-		if MAX_MONTH_IN_YEAR - self.month < value%MAX_MONTH_IN_YEAR:
+		value = value%MAX_MONTH_IN_YEAR
+		if MAX_MONTH_IN_YEAR - self.month < value:
 			self.year += 1
-			self.month = value%MAX_MONTH_IN_YEAR - (MAX_MONTH_IN_YEAR - self.month)
+			self.month = value - (MAX_MONTH_IN_YEAR - self.month)
 		else:
-			self.month += value%MAX_MONTH_IN_YEAR
+			self.month += value
 
 
 	def add_days(self, value):
@@ -87,11 +91,11 @@ class Calendar:
 		if not isinstance(value, int):
 			raise TypeError("Wrong type, should be int")
 
-		if (self.months[self.isleap_february()] - self.day) < 0: 
-			self.day = self.months[self.isleap_february()]
+		if (self.days_in_months[self.define_month()] - self.day) < 0: 
+			self.day = self.days_in_months[self.define_month()]
 
-		while value >= self.months[self.isleap_february()] - self.day + 1:
-			value -= self.months[self.isleap_february()] - self.day + 1
+		while value >= self.days_in_months[self.define_month()] - self.day + 1:
+			value -= self.days_in_months[self.define_month()] - self.day + 1
 			self.day = 1
 			self.add_months(1)
 		self.day += value
@@ -127,12 +131,14 @@ class Calendar:
 		Also changes the month, if needed"""
 		if not isinstance(value, int):
 			raise TypeError("Wrong type, should be int")
-		if (self.months[self.isleap_february()] - self.day) < 0: 
-			self.day = self.months[self.isleap_february()]
+
+		if (self.days_in_months[self.define_month()] - self.day) < 0: 
+			self.day = self.days_in_months[self.define_month()]
+
 		while value >= self.day:
 			value -= self.day 
 			self.sub_months(1)
-			self.day = self.months[self.month  if not (self.isleap() and self.month == 2) else 0]
+			self.day = self.days_in_months[self.month  if not (self.isleap() and self.month == 2) else 0]
 		self.day -= value
 		
 
@@ -204,7 +210,7 @@ class Calendar:
 			return self.day > other.day
 		return True
 
-
+    
 
 if __name__ == "__main__":
 	x = Calendar(1, 1, 2025)
@@ -213,8 +219,10 @@ if __name__ == "__main__":
 	x+=y
 	print(x)
 
-	x-=y
-	print(x)
+
+	for i in range (10):
+		x-=y
+		print(x)
 
 	print(f"{x == y = }")
 	print(f"{x != y = }")
